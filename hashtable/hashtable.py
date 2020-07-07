@@ -6,20 +6,6 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
-
-    #  def __repr__(self):
-    #     contents = ''
-    #     current_node = self
-
-    #     while current_node.next:
-    #         contents += str(self.value) + ' => '
-    #         current_node = current_node.next
-
-    #     contents += 'None'
-
-    #     return contents
-
-
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 class HashTable:
@@ -28,19 +14,10 @@ class HashTable:
     that accepts string keys
     Implement this.
     """
-
     def __init__(self, capacity):
-        # Your code here
         self.capacity = capacity
-        self.items_stored = 0
-        self.storage = [None] * capacity
-
-    def __repr__(self):
-        report = f"Hashtable\n {self.items_stored}/{self.capacity} items stored.\n"
-        contents = "\n".join([str(index) + ": " + str(linked_list) for index, linked_list in enumerate(self.storage)])
-
-        return report + contents
-
+        self.data = [None] * capacity
+        self.size = 0
 
     def get_num_slots(self):
         """
@@ -68,17 +45,10 @@ class HashTable:
         DJB2 hash, 32-bit
         Implement this, and/or FNV-1.
         """
-        # Your code here
-        key_bytes = key.encode()
         hash = 5381
-        for k_byte in key_bytes:
-            hash = hash * 33 + k_byte
-            hash &= 0xffffffff
-
-        return hash
-
-
-
+        for x in key:
+            hash = (( hash << 5) + hash) + ord(x)
+        return hash & 0xFFFFFFFF
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
@@ -92,33 +62,50 @@ class HashTable:
         Hash collisions should be handled with Linked List Chaining.
         Implement this.
         """
-        # Your code here
-
         i = self.hash_index(key)
-        self.storage[i] = value
+        self.data[i] = value
 
+        # Today - attempt 
+        # i = self.hash_index(key)
+        # if(self.data[i] == None):
+        #     self.data[i] = HashTableEntry(key, value)
+        #     self.size += 1
+        #     return
+        # else:
+        #     curr = self.data[i].head
+        #     while curr.next:
+        #         if curr.key == key:
+        #             curr.value = value
+        #         curr = curr.next
+        #     curr.next = HashTableEntry(key, value)
+        #     self.size += 1
+            
     def delete(self, key):
         """
         Remove the value stored with the given key.
         Print a warning if the key is not found.
         Implement this.
         """
-        # Your code here
         i = self.hash_index(key)
-        self.storage[i] = None
+        if self.data[i] is None:
+            print("not found")
+        else:
+            self.data[i] = None
 
-
+        #  Today
+        # i = self.hash_index(key)
+        # curr = self.storage[index].head
     def get(self, key):
         """
         Retrieve the value stored with the given key.
         Returns None if the key is not found.
         Implement this.
         """
-        # Your code here
         i = self.hash_index(key)
-        return self.storage[i]
-
-
+        if self.data[i] is None:
+            return None
+        else:
+            return self.data[i]
     def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
@@ -128,7 +115,7 @@ class HashTable:
         # Your code here
 if __name__ == "__main__":
     ht = HashTable(8)
-    ht.put("line_1", "'Twas brilling, and the slithy toves")
+    ht.put("line_1", "'Twas brillig, and the slithy toves")
     ht.put("line_2", "Did gyre and gimble in the wabe:")
     ht.put("line_3", "All mimsy were the borogoves,")
     ht.put("line_4", "And the mome raths outgrabe.")
